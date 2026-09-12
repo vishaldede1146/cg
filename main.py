@@ -38,6 +38,7 @@ origins = [
     "https://www.coregrowthsolutions.com",
     "https://coregrowthsolutions.com",
     "https://core-growth-solutions.vercel.app",
+    "http://127.0.0.1:5500",
 ]
 
 app.add_middleware(
