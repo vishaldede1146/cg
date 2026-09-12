@@ -26,14 +26,24 @@ app = FastAPI(
     ],
 )
 
-# CORS Configuration — handles environment-driven allowed origins for frontend deployments (e.g., Vercel)
-allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "*")
-origins = [origin.strip() for origin in allowed_origins_env.split(",")]
+# -----------------------------------------------------------------------
+# CORS Configuration
+# -----------------------------------------------------------------------
+# Hardcoded to the real production frontend domain(s). Add more origins to
+# this list (comma-separated entries as separate list items) if you deploy
+# additional frontends (e.g. a Vercel preview URL) — always as a Python
+# list, never a bare string (a bare string gets iterated character by
+# character and silently blocks every real origin).
+origins = [
+    "https://www.coregrowthsolutions.com",
+    "https://coregrowthsolutions.com",
+    "https://core-growth-solutions.vercel.app",
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins=origins,  # always a list — never assign a bare string here
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -73,7 +83,11 @@ async def health_check():
 
 
 if __name__ == "__main__":
+    # Local development entrypoint only. On Render, the start command should
+    # invoke uvicorn directly (e.g. `uvicorn main:app --host 0.0.0.0 --port $PORT`)
+    # WITHOUT reload, so this block and its reload=True are never hit in prod.
     import uvicorn
 
     port = int(os.getenv("PORT", 8000))
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+    
